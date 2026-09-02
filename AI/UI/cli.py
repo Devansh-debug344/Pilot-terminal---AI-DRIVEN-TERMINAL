@@ -1,32 +1,27 @@
 import typer , os 
 from pathlib import Path
 from rich.console import Console
-from ..LLM.client import Client , CLIENT_Error , API_Error  
-from AI.Config.config import API
 import subprocess
 from .cliscreen import welcome_screen
+from AI.Agent.agent import Agent
 # import tkinter as tk
 # from tkinter import filedialog
-
-
-
 app = typer.Typer()
-
 console = Console()
-
 # welcome_screen()
 
-
-def get_response(query : str):
+class CLI:
+    def __init__(self , agent : Agent):
+        self.agent = agent
+    
+    def get_response(self , query : str):
         try:
-         client = Client(API.set_api()) 
-         client.create_client()
-         res = client.request(query)
+           res = self.agent.request(query)
 
-         return res
+           return res
 
-        except CLIENT_Error as ce:
-           raise(f'error {ce} in search function')
+        except RuntimeError as ce:
+           raise RuntimeError(f"Error {ce} in search function") from ce
 
 
 # def gui():
@@ -51,17 +46,14 @@ def get_response(query : str):
 
 #     root.mainloop()
 
+    def run(self):
+      @app.command()
+      def search(query : str) -> None:
 
-@app.command()
-def search(query : str) -> None:
-
-    messages = get_response(query)
+        messages = self.get_response(query)
 
     # console.print(messages[len(messages) - 1].get('content'))
     # console.print(messages)
-    console.print("\n✨ Done!\n")
-
-
-
-if __name__ == "__main__":
-      app()
+        console.print(messages)
+        console.print("\n✨ Done!\n")
+      app() 
