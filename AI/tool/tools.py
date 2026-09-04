@@ -1,11 +1,10 @@
 from pathlib import Path
-import subprocess, json
+import os , subprocess, json
 from googlesearch import search
 def read_from_file(filepath : str) -> dict:
     filepath = Path(filepath)
     with open(file=filepath , mode="r" ) as file:
       try:
-          
           return {"status" : "success" , "content" : file.read()}
       except FileNotFoundError as exc:
            raise (f'file not found in system . Error shows {exc}')
@@ -25,6 +24,7 @@ def write_in_file(filepath : str , content :str):
 
 def shell_commands(command : str):
     try:
+        
         subprocess.run(command , shell=True)
     except Exception as exc:
         raise (f"Error in excecuting shell_commands. {exc}")       
@@ -47,6 +47,68 @@ def web_search(query: str):
     except BaseException as e:
         raise(f"error: Search failed: {str(e)} and query: {query}")
 
+def list_directory(path: str):
+    """List directory structure"""
+    try:
+        print(f"\n[DEBUG] Input path: {path}")
+        if path == ".":
+            path = os.getcwd()
+        else:
+            path = os.path.expanduser(path)
+            path = os.path.abspath(path)
+
+        
+        if not os.path.exists(path):
+            return {"error": f"Path not found: {path}"}
+        
+        if not os.path.isdir(path):
+            return {"error": f"Not a directory: {path}"}
+        
+        ignore = {'__pycache__', '.git', '.venv', 'node_modules', '.pytest_cache'}
+        path_obj = Path(path)
+        
+        def get_tree(directory, prefix="", is_last=True):
+            lines = []
+            try:
+                items = sorted(directory.iterdir())
+            except PermissionError as e:
+                print(f"[DEBUG] Permission error: {e}")
+                return lines
+            except Exception as e:
+                print(f"[DEBUG] Error iterating: {e}")
+                return lines
+            
+            items = [i for i in items if i.name not in ignore]
+            dirs = [i for i in items if i.is_dir()]
+            files = [i for i in items if i.is_file()]
+            all_items = dirs + files
+            
+            for i, item in enumerate(all_items):
+                is_last_item = (i == len(all_items) - 1)
+                connector = "└── " if is_last_item else "├── "
+                
+                if item.is_dir():
+                    lines.append(f"{prefix}{connector}📁 {item.name}/")
+                    extension = "    " if is_last_item else "│   "
+                    lines.extend(get_tree(item, prefix + extension, is_last_item))
+                else:
+                    lines.append(f"{prefix}{connector}📄 {item.name}")
+            
+            return lines
+        
+        tree_lines = [f"📁 {path_obj.name}/"]
+        tree_lines.extend(get_tree(path_obj))
+        
+        return {
+            "path": str(path_obj),
+            "structure": "\n".join(tree_lines)
+        }
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return {"error": f"Exception: {str(e)}"}
+    
 tools = [
         {
           "type" : "function" , 
@@ -114,7 +176,24 @@ tools = [
                          "required" : ["query"],      
                        }
                        }
-                  }
+                  },
+                  {
+    "type" : "function" , 
+    "function" : {          
+        "name": "list_directory",
+        "description": "List files and folders in a directory",
+        "parameters": { 
+            "type": "object",
+            "properties": {
+                "path": {
+                    "type": "string",
+                    "description": "Directory path (e.g., '.', '/home/devansh/fastapi')"
+                }
+            },
+            "required": ["path"]
+        }
+    }
+}
     ]
 
 

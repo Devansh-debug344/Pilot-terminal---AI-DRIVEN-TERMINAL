@@ -2,10 +2,8 @@ import typer , os
 from pathlib import Path
 from rich.console import Console
 import subprocess
-from .cliscreen import welcome_screen
 from AI.Agent.agent import Agent
-# import tkinter as tk
-# from tkinter import filedialog
+from .cliscreen import PilotApp
 app = typer.Typer()
 console = Console()
 # welcome_screen()
@@ -51,9 +49,6 @@ class CLI:
       def search(query : str) -> None:
 
         messages = self.get_response(query)
-
-    # console.print(messages[len(messages) - 1].get('content'))
-    # console.print(messages)
         console.print(messages)
         console.print("\n✨ Done!\n")
       app() 
