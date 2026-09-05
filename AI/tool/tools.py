@@ -1,6 +1,7 @@
 from pathlib import Path
 import os , subprocess, json
 from googlesearch import search
+
 def read_from_file(filepath : str) -> dict:
     filepath = Path(filepath)
     with open(file=filepath , mode="r" ) as file:
@@ -16,17 +17,17 @@ def write_in_file(filepath : str , content :str):
     with open(file=filepath , mode="w") as file:
           try:
               file.write(content)
-              return {"status" : "success" , "message" :f"File read sucessfully in filepath {filepath}"}
+              return {"status" : "success" , "message" :f"File write sucessfully in filepath {filepath}"}
           except FileNotFoundError as exc:
                 return {"status" : "error" ,  "message" : f"File not found {exc}"} 
           except Exception as exc:
-              return {"status" : "error" ,  "message" : f"Error in write from file {exc}"} 
+              return {"status" : "error" ,  "message" : f"Error in write file {exc}"} 
 
 def shell_commands(command : str):
     try:
         
         result = subprocess.run(command , shell=True , capture_output=True , text=True)
-        
+
         return {
             "status" : "success",
             "stdout" : result.stdout,
@@ -38,21 +39,21 @@ def shell_commands(command : str):
 
 def web_search(query: str):
     """Search the web for information"""
-    
-    
-
     try:
         res = search(query , num_results=5)
 
         final_answer = []
-        print("i am stan lee")
         for i , url in enumerate(res):
            final_answer.append((i , url))
 
-        return final_answer   
+        return {
+            "status" : "success",
+            "output" : final_answer
+            }
+       
     
-    except BaseException as e:
-        raise(f"error: Search failed: {str(e)} and query: {query}")
+    except BaseException as exc:
+        return {"status" : "error" ,  "message" : f"Error in web searching {exc}"} 
 
 def list_directory(path: str):
     """List directory structure"""
@@ -121,7 +122,7 @@ tools = [
           "type" : "function" , 
           "function" : {
               "name" : "read_from_file",
-              "description" : "You only run when user explicilty use word read / Read otherwise not . Read the content of a specified file and do analysis if ask, use this to read file and in the end tell user that you read the file succesfully ",
+              "description" : "You only run when user explicitly use word read / Read otherwise not . Read the content of a specified file and do analysis if ask, use this to read file and in the end tell user that you read the file succesfully ",
                "parameters": {
                 "type": "object",
                 "properties": {

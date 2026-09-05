@@ -10,19 +10,21 @@ class Agent:
         self._message = message
         self._client = client
 
-    def request(self , query : str):   
-                self._message = [
+    def request(self , query : str):  
+                if self._message is None: 
+                  self._message = [
                     {
                     "role" : "system",
                     "content" : prompt.SystemInstruction().instruction()
                     }
-                ]
+                   ]
 
     
                 self._message.append({
                    "role" : "user",
                    "content" : query
                 })
+                
                 if self._client is None:
                      return f"client is none bro"
                 
