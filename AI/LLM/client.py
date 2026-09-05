@@ -4,9 +4,6 @@ from openai import OpenAI
 from ..tool.tools import tools
 from rich.console import Console
 
-
-
-
 console = Console()
 class CLIENT_ERROR(Exception):
     pass
@@ -22,15 +19,15 @@ class Client:
         self._gen_ai = gen_ai
 
     def create_client(self):
-            if self._gen_ai is None:
-               
-              if self._api.api_key:
-                self._gen_ai = OpenAI(
-                    api_key= self._api.api_key,
-                    base_url=self._api.base_url
-                )
-              else:
-                  raise API_ERROR(f"Api_key  not found for this cleint")
+                if self._gen_ai is None:
+                   
+                  if self._api.api_key:
+                    self._gen_ai = OpenAI(
+                        api_key= self._api.api_key,
+                        base_url=self._api.base_url
+                    )
+                  else:
+                      raise API_ERROR(f"Api key  not found for this cleint")
 
     def send(self , message : list):
         self.create_client()

@@ -7,27 +7,34 @@ def read_from_file(filepath : str) -> dict:
       try:
           return {"status" : "success" , "content" : file.read()}
       except FileNotFoundError as exc:
-           raise (f'file not found in system . Error shows {exc}')
+           return {"status" : "error" ,  "message" : f"File not found . {exc}"}
       except Exception as exc:
-           raise (f"Error in read from file . {exc}")       
+           return {"status" : "error" ,  "message" : f"Error in read from file {exc}"}       
 
 def write_in_file(filepath : str , content :str):
-    file_path = Path(filepath)
+    filepath = Path(filepath)
     with open(file=filepath , mode="w") as file:
           try:
               file.write(content)
               return {"status" : "success" , "message" :f"File read sucessfully in filepath {filepath}"}
           except FileNotFoundError as exc:
-               raise (f'file not found in system . Error shows {exc}')
+                return {"status" : "error" ,  "message" : f"File not found {exc}"} 
           except Exception as exc:
-               raise (f"Error in read from file . {exc}")
+              return {"status" : "error" ,  "message" : f"Error in write from file {exc}"} 
 
 def shell_commands(command : str):
     try:
         
-        subprocess.run(command , shell=True)
+        result = subprocess.run(command , shell=True , capture_output=True , text=True)
+        
+        return {
+            "status" : "success",
+            "stdout" : result.stdout,
+            "stderr" : result.stderr,
+            "returncode" : result.returncode
+        }
     except Exception as exc:
-        raise (f"Error in excecuting shell_commands. {exc}")       
+       return {"status" : "error" ,  "message" : f"Error in executing shell command {exc}"} 
 
 def web_search(query: str):
     """Search the web for information"""

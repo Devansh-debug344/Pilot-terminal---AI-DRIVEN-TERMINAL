@@ -7,8 +7,8 @@ from AI.UI.cli import CLI
 def app():
     client = Client(API.set_api())
     agent = Agent(client)
-    PilotApp(agent=agent).run()
-    # CLI(agent=agent).run()
+    # PilotApp(agent=agent).run()
+    CLI(agent=agent).run()
 
 if __name__ == "__main__":
       app()
