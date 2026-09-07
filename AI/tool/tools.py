@@ -58,7 +58,6 @@ def web_search(query: str):
 def list_directory(path: str):
     """List directory structure"""
     try:
-        print(f"\n[DEBUG] Input path: {path}")
         if path == ".":
             path = os.getcwd()
         else:
@@ -80,10 +79,8 @@ def list_directory(path: str):
             try:
                 items = sorted(directory.iterdir())
             except PermissionError as e:
-                print(f"[DEBUG] Permission error: {e}")
                 return lines
             except Exception as e:
-                print(f"[DEBUG] Error iterating: {e}")
                 return lines
             
             items = [i for i in items if i.name not in ignore]
@@ -113,8 +110,6 @@ def list_directory(path: str):
         }
 
     except Exception as e:
-        import traceback
-        traceback.print_exc()
         return {"error": f"Exception: {str(e)}"}
     
 tools = [
